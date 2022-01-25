@@ -1,0 +1,7 @@
+/target/
+/.idea/
+/META-INF/
+/out/
+/resources/
+/src/test/
+/config.ini
