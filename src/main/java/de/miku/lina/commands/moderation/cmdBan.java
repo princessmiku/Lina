@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 
@@ -31,6 +30,7 @@ public class cmdBan extends Command {
         commandData = new CommandData(name, "Ban a member from your guild.").addOption(
                 OptionType.USER, "member", "select user to ban", true
         );
+
     }
 
     @Override

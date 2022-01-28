@@ -3,6 +3,7 @@ package de.miku.lina.utils;
 import de.miku.lina.commands.Command;
 import de.miku.lina.handlers.CommandHandler;
 import de.miku.lina.handlers.ConfigHandler;
+import de.miku.lina.handlers.InteractionHandler;
 import net.dv8tion.jda.api.JDA;
 
 import java.util.HashMap;
@@ -15,6 +16,7 @@ public class DataShare {
     public static ConfigHandler configHandler;
 
     public static CommandHandler commandHandler;
+    public static InteractionHandler interactionHandler;
 
     public static JDA jda;
 
