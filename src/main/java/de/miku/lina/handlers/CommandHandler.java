@@ -1,6 +1,7 @@
 package de.miku.lina.handlers;
 
 import de.miku.lina.commands.Command;
+import de.miku.lina.commands.interactions.InteractionCommand;
 import de.miku.lina.utils.DataShare;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -16,13 +17,18 @@ public class CommandHandler {
 
     private Map<String, Command> slashCommands;
     private Map<String, Command> textCommands;
+    private Map<String, InteractionCommand> sfwCommands, nsfwCommands;
     private String prefix;
     private MessageEmbed helpEmbed;
+    private boolean finish;
 
     public CommandHandler() {
+        finish = false;
         prefix = DataShare.configHandler.getString("DISCORD", "prefix");
-        slashCommands = new HashMap<String, Command>();
-        textCommands = new HashMap<String, Command>();
+        slashCommands = new HashMap<>();
+        textCommands = new HashMap<>();
+        sfwCommands = new HashMap<>();
+        nsfwCommands = new HashMap<>();
 
         CommandListUpdateAction commandListUpdateAction = DataShare.jda.updateCommands();
 
@@ -42,6 +48,12 @@ public class CommandHandler {
         // submit slash commands
         commandListUpdateAction.queue();
         generateHelpEmbed();
+        finish = true;
+    }
+
+    public void addInteractCommands(Map<String, InteractionCommand> sfw, Map<String, InteractionCommand> nsfw) {
+        sfwCommands.putAll(sfw);
+        nsfwCommands.putAll(nsfw);
     }
 
     public void generateHelpEmbed() {
@@ -102,8 +114,26 @@ public class CommandHandler {
         Command command = textCommands.get(invoke);
         // check if command exists and run it
         if (command != null) command.onMessage(event, Arrays.copyOfRange(args, 1, args.length));
+        else {
+            if (sfwCommands.containsKey(invoke) || nsfwCommands.containsKey(invoke)) {
+                InteractionCommand sfw = sfwCommands.get(invoke);
+                InteractionCommand nsfw = nsfwCommands.get(invoke);
+                if (event.getTextChannel().isNSFW() && nsfw != null) {
+                    nsfw.onMessage(event);
+                } else if (sfw != null) {
+                    sfw.onMessage(event);
+                }
+            }
+        }
     }
 
+    public void addTextCommand(String name, Command command) {
+        textCommands.put(name, command);
+    }
+
+    public boolean isFinish() {
+        return finish;
+    }
 
     public MessageEmbed getHelpEmbed() {
         return helpEmbed;

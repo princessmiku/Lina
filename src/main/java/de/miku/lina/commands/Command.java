@@ -17,6 +17,11 @@ public abstract class Command {
         String[] theName = this.getClass().getPackageName().split("\\.");
         this.category = theName[theName.length - 1];
         DataShare.commands.put(this.name, this);
+        if (DataShare.commandHandler != null) {
+            if (DataShare.commandHandler.isFinish()) {
+                DataShare.commandHandler.addTextCommand(this.name, this);
+            }
+        }
     }
 
     protected abstract void generateCommandData();

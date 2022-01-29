@@ -2,6 +2,8 @@ package de.miku.lina;
 
 import de.miku.lina.commands.fun.cmdHey;
 import de.miku.lina.commands.information.cmdHelp;
+import de.miku.lina.commands.interactions.InteractionCommand;
+import de.miku.lina.commands.interactions.cmdInteracts;
 import de.miku.lina.commands.moderation.cmdBan;
 import de.miku.lina.commands.moderation.cmdClear;
 import de.miku.lina.commands.moderation.cmdShutdown;
@@ -50,8 +52,8 @@ public class Main {
         // register events
         registerEvent(builder);
         registerCommands();
-        //DataShare.jda = builder.build();
-        //DataShare.commandHandler = new CommandHandler();
+        DataShare.jda = builder.build();
+        DataShare.commandHandler = new CommandHandler();
         DataShare.interactionHandler = new InteractionHandler();
 
         // init handlers after build the jda
@@ -73,6 +75,7 @@ public class Main {
         new cmdBan();
         new cmdClear();
         new cmdShutdown();
+        new cmdInteracts();
     }
 
 }

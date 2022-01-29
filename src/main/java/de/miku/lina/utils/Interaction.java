@@ -1,15 +1,21 @@
 package de.miku.lina.utils;
 
+import de.miku.lina.commands.Command;
+import de.miku.lina.commands.interactions.InteractionCommand;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+
 public class Interaction {
 
     private Map<String, String> gifs;
     private String name, mono, mention;
-    private boolean nsfw;
+    private boolean nsfw, hasOtherCategoryCommand;
 
     public Interaction(String name, String mono, String mention, Map<String, String> gifs) {
         this.name = name;
@@ -26,12 +32,18 @@ public class Interaction {
     }
 
     public String getRandomGif() {
-        Random random = new Random();
-        return gifs.get(random.nextInt(gifs.size() - 1));
+        Random generator = new Random();
+        Object[] values = gifs.values().toArray();
+        String randomValue = (String) values[generator.nextInt(values.length)];
+        return randomValue;
     }
 
     public Map<String, String> getGifs() {
         return gifs;
+    }
+
+    public InteractionCommand generateCommand() {
+        return new InteractionCommand(name, this);
     }
 
     public String getName() {
@@ -52,5 +64,13 @@ public class Interaction {
 
     public boolean isNsfw() {
         return nsfw;
+    }
+
+    public boolean isHasOtherCategoryCommand() {
+        return hasOtherCategoryCommand;
+    }
+
+    public void setHasOtherCategoryCommand(boolean hasOtherCategoryCommand) {
+        this.hasOtherCategoryCommand = hasOtherCategoryCommand;
     }
 }
