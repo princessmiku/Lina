@@ -4,6 +4,7 @@
 /out/
 /resources/
 /src/test/
-/config.ini
-/gifs.json
-/gifsNsfw.json
+/src/main/resources/config.ini
+/src/main/resources/gifs.json
+/src/main/resources/gifsNsfw.json
+/src/main/resources/guilds.json

@@ -4,11 +4,13 @@ import de.miku.lina.commands.fun.cmdHey;
 import de.miku.lina.commands.information.cmdHelp;
 import de.miku.lina.commands.interactions.InteractionCommand;
 import de.miku.lina.commands.interactions.cmdInteracts;
+import de.miku.lina.commands.moderation.cmdAddReactionRole;
 import de.miku.lina.commands.moderation.cmdBan;
 import de.miku.lina.commands.moderation.cmdClear;
 import de.miku.lina.commands.moderation.cmdShutdown;
 import de.miku.lina.handlers.CommandHandler;
 import de.miku.lina.handlers.ConfigHandler;
+import de.miku.lina.handlers.GuildHandler;
 import de.miku.lina.handlers.InteractionHandler;
 import de.miku.lina.listeners.MessageListener;
 import de.miku.lina.listeners.SlashListener;
@@ -30,7 +32,7 @@ public class Main {
     public static void main(String[] args) throws LoginException {
         // init config handler
         try {
-            DataShare.configHandler = new ConfigHandler("./config.ini");
+            DataShare.configHandler = new ConfigHandler("./src/main/resources/config.ini");
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(0);
@@ -54,11 +56,13 @@ public class Main {
         // register events
         registerEvent(builder);
         registerCommands();
-        DataShare.jda = builder.build();
+        // load the guilds
+        DataShare.guildHandler = new GuildHandler();
 
+        // build the bot
+        DataShare.jda = builder.build();
         // init the command handler
         DataShare.commandHandler = new CommandHandler();
-
         // init the interaction handler after the command handler, for not floating the help list
         DataShare.interactionHandler = new InteractionHandler();
         // init commands that should be hidden, hidden commands are not slash compatible
@@ -84,6 +88,7 @@ public class Main {
         new cmdBan();
         new cmdClear();
         new cmdInteracts();
+        new cmdAddReactionRole();
     }
 
     public static void registerHiddenCommands() {

@@ -26,8 +26,8 @@ public class InteractionHandler {
         JsonReader reader = null;
         JsonReader readerNsfw = null;
         try {
-            reader = new JsonReader(new FileReader("./gifs.json"));
-            readerNsfw = new JsonReader(new FileReader("./gifsNsfw.json"));
+            reader = new JsonReader(new FileReader("./src/main/resources/gifs.json"));
+            readerNsfw = new JsonReader(new FileReader("./src/main/resources/gifsNsfw.json"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             System.exit(0);

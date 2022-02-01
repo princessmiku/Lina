@@ -102,6 +102,10 @@ public class CommandHandler {
     }
 
     public void onTextCommand(@NotNull MessageReceivedEvent event) {
+        // check if guild registered
+        DataShare.guildHandler.checkGuild(event.getGuild());
+        DataShare.guildHandler.save();
+
         // check if message starts with prefix and the author is not a bot
         if (!event.getMessage().getContentDisplay().startsWith(prefix) || event.getAuthor().isBot()) return;
         if (!event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_WRITE) || !event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS))
