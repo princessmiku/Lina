@@ -47,6 +47,17 @@ public class GuildHandler {
         guilds.put(guild.getId(), new GuildE(guild));
     }
 
+    public GuildE guildAdd(Guild guild) {
+        if (guilds.containsKey(guild.getId())) return guilds.get(guild.getId());
+        guilds.put(guild.getId(), new GuildE(guild));
+        return guilds.get(guild.getId());
+    }
+
+    public GuildE getGuild(Guild guild) {
+        if (guilds.containsKey(guild.getId())) return guilds.get(guild.getId());
+        return guildAdd(guild);
+    }
+
     public void save() {
         Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting()
                 .create();

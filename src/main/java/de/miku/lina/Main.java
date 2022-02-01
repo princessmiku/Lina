@@ -2,6 +2,7 @@ package de.miku.lina;
 
 import de.miku.lina.commands.fun.cmdHey;
 import de.miku.lina.commands.information.cmdHelp;
+import de.miku.lina.commands.information.cmdHelpFull;
 import de.miku.lina.commands.interactions.InteractionCommand;
 import de.miku.lina.commands.interactions.cmdInteracts;
 import de.miku.lina.commands.moderation.cmdAddReactionRole;
@@ -75,7 +76,7 @@ public class Main {
     }
 
     private static void registerEvent(JDABuilder builder) {
-        builder.addEventListeners(new MessageListener(), new SlashListener());
+        builder.addEventListeners(new MessageListener(), new SlashListener(), DataShare.eventWaiter);
     }
 
     public static void registerCommands() {
@@ -89,6 +90,7 @@ public class Main {
         new cmdClear();
         new cmdInteracts();
         new cmdAddReactionRole();
+        new cmdHelpFull();
     }
 
     public static void registerHiddenCommands() {

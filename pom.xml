@@ -14,6 +14,13 @@
 
     </properties>
     <repositories>
+        <!-- Chew's Maven Repo for JDA-Chewtils -->
+        <repository>
+            <id>chew</id>
+            <name>m2-chew</name>
+            <url>https://m2.chew.pro/releases</url>
+        </repository>
+        <!-- JDA repo to get JDA -->
         <repository>
             <id>dv8tion</id>
             <name>m2-dv8tion</name>
@@ -27,10 +34,15 @@
             <version>4.3.0_277</version>
         </dependency>
         <dependency>
-        <groupId>org.ini4j</groupId>
-        <artifactId>ini4j</artifactId>
-        <version>0.5.4</version>
-    </dependency>
+            <groupId>pw.chew</groupId>
+            <artifactId>jda-chewtils</artifactId>
+            <version>1.24.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ini4j</groupId>
+            <artifactId>ini4j</artifactId>
+            <version>0.5.4</version>
+        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
