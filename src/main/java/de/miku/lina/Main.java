@@ -13,18 +13,20 @@ import de.miku.lina.handlers.InteractionHandler;
 import de.miku.lina.listeners.MessageListener;
 import de.miku.lina.listeners.SlashListener;
 import de.miku.lina.utils.DataShare;
+import de.miku.lina.utils.Logging;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.internal.utils.AllowedMentionsImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Main {
-
     public static void main(String[] args) throws LoginException {
         // init config handler
         try {
@@ -53,11 +55,18 @@ public class Main {
         registerEvent(builder);
         registerCommands();
         DataShare.jda = builder.build();
+
+        // init the command handler
         DataShare.commandHandler = new CommandHandler();
+
+        // init the interaction handler after the command handler, for not floating the help list
         DataShare.interactionHandler = new InteractionHandler();
+        // init commands that should be hidden, hidden commands are not slash compatible
+        registerHiddenCommands();
 
         // init handlers after build the jda
-        System.out.println("Bot is online");
+        Logging.info(Main.class, "Bot is online...");
+
 
     }
 
@@ -74,8 +83,11 @@ public class Main {
         new cmdHey();
         new cmdBan();
         new cmdClear();
-        new cmdShutdown();
         new cmdInteracts();
+    }
+
+    public static void registerHiddenCommands() {
+        new cmdShutdown();
     }
 
 }

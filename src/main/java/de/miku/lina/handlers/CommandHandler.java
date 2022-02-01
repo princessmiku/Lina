@@ -36,7 +36,7 @@ public class CommandHandler {
         for (Map.Entry<String, Command> entry : DataShare.commands.entrySet()) {
             if (!entry.getValue().isActive()) continue;
             if (entry.getValue().isSlashCompatible()){
-                commandListUpdateAction.addCommands(entry.getValue().getCommandData());
+                CommandListUpdateAction __ = commandListUpdateAction.addCommands(entry.getValue().getCommandData());
                 slashCommands.put(entry.getKey().toLowerCase(), entry.getValue());
             }
             if (entry.getValue().isMessageCompatible()) {
@@ -59,8 +59,8 @@ public class CommandHandler {
     public void generateHelpEmbed() {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle(":notepad_spiral: Help from " + DataShare.jda.getSelfUser().getName());
-        String desc = "Active Commands\nSlash Commands market with :small_orange_diamond:\nText Command market with :small_blue_diamond:\n\n";
-        Map<String, ArrayList<String>> category = new HashMap<String, ArrayList<String>>();
+        String desc = "My prefix is `%s`\n\n**Active Commands**\nSlash Commands market with :small_orange_diamond:\nText Command market with :small_blue_diamond:\n\n".formatted(prefix);
+        Map<String, ArrayList<String>> category = new HashMap<>();
         for (Map.Entry<String, Command> entry : DataShare.commands.entrySet()) {
             if (!entry.getValue().isActive()) continue;
             String myde = "";
@@ -74,7 +74,7 @@ public class CommandHandler {
             else
                 myde += ":black_small_square:";
             String categoryName = entry.getValue().getCategory().substring(0, 1).toUpperCase() + entry.getValue().getCategory().substring(1);
-            if (!category.containsKey(categoryName)) category.put(categoryName, new ArrayList<String>());
+            if (!category.containsKey(categoryName)) category.put(categoryName, new ArrayList<>());
             category.get(categoryName).add(myde + " `%s`\n".formatted(entry.getKey().toLowerCase()));
         }
         ArrayList<String> sortedKeys = new ArrayList(category.keySet());
