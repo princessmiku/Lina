@@ -101,7 +101,7 @@ public class cmdAddReactionRole extends Command {
                             builder.setTitle("Creation Successful");
                             builder.setDescription(embedString);
                             builder.setColor(ColorPlate.BLUE);
-                            msg.editOriginalEmbeds(builder.build()).queue();
+                            msg.editOriginalEmbeds(builder.build()).queue(errorMSG -> errorMSG.delete().queueAfter(5, TimeUnit.SECONDS));
                     }, 2, TimeUnit.MINUTES, () -> {
                             msg.editOriginalEmbeds(DiscordEmbeds.error(event.getUser(), "Time out...")).queue(errorMSG -> errorMSG.delete().queueAfter(5, TimeUnit.SECONDS));
                             return;

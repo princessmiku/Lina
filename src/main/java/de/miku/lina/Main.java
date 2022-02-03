@@ -3,17 +3,14 @@ package de.miku.lina;
 import de.miku.lina.commands.fun.cmdHey;
 import de.miku.lina.commands.information.cmdHelp;
 import de.miku.lina.commands.information.cmdHelpFull;
-import de.miku.lina.commands.interactions.InteractionCommand;
 import de.miku.lina.commands.interactions.cmdInteracts;
-import de.miku.lina.commands.moderation.cmdAddReactionRole;
-import de.miku.lina.commands.moderation.cmdBan;
-import de.miku.lina.commands.moderation.cmdClear;
-import de.miku.lina.commands.moderation.cmdShutdown;
+import de.miku.lina.commands.moderation.*;
 import de.miku.lina.handlers.CommandHandler;
 import de.miku.lina.handlers.ConfigHandler;
 import de.miku.lina.handlers.GuildHandler;
 import de.miku.lina.handlers.InteractionHandler;
 import de.miku.lina.listeners.MessageListener;
+import de.miku.lina.listeners.ReactionListener;
 import de.miku.lina.listeners.SlashListener;
 import de.miku.lina.utils.DataShare;
 import de.miku.lina.utils.Logging;
@@ -22,11 +19,8 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.internal.utils.AllowedMentionsImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Main {
@@ -38,8 +32,9 @@ public class Main {
             e.printStackTrace();
             System.exit(0);
         }
-        // construct Builder with token
+        // Disable all mentions on replay
         AllowedMentionsImpl.setDefaultMentionRepliedUser(false);
+        // construct Builder with token
         JDABuilder builder = JDABuilder.createDefault(DataShare.configHandler.getString("DISCORD", "token"));
         // set the bot settings
         // set the activity
@@ -76,7 +71,7 @@ public class Main {
     }
 
     private static void registerEvent(JDABuilder builder) {
-        builder.addEventListeners(new MessageListener(), new SlashListener(), DataShare.eventWaiter);
+        builder.addEventListeners(new MessageListener(), new SlashListener(), DataShare.eventWaiter, new ReactionListener());
     }
 
     public static void registerCommands() {
@@ -91,6 +86,7 @@ public class Main {
         new cmdInteracts();
         new cmdAddReactionRole();
         new cmdHelpFull();
+        new cmdEmbedCreator();
     }
 
     public static void registerHiddenCommands() {

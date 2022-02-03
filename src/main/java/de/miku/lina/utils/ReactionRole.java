@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Role;
 public class ReactionRole {
 
     private String channelId, messageId, roleId, emoji;
+    private Role role;
 
     public ReactionRole(String channelId, String messageId, String roleId, String emoji) {
         this.channelId = channelId;
@@ -16,22 +17,37 @@ public class ReactionRole {
         this.emoji = emoji;
     }
 
+    public Role getRole(Guild guild) {
+        if (role == null)
+            role = guild.getRoleById(roleId);
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public void roleSwitch(Member member) {
+        if (role == null) {
+            role = member.getGuild().getRoleById(roleId);
+        }
+        if (!member.getGuild().getSelfMember().canInteract(role)) return;
+        if (member.getRoles().contains(role))
+            removeRole(member);
+        else
+            addRole(member);
+    }
+
     public void addRole(Member member) {
-        Guild guild = member.getGuild();
-        if (!guild.getSelfMember().canInteract(member)) return;
-        Role role = guild.getRoleById(roleId);
-        if (role == null) return;
-        if (member.getRoles().contains(role)) return;
-        guild.addRoleToMember(member, role).queue();
+        if (role == null)
+            role = member.getGuild().getRoleById(roleId);
+        member.getGuild().addRoleToMember(member, role).queue();
     }
 
     public void removeRole(Member member) {
-        Guild guild = member.getGuild();
-        if (!guild.getSelfMember().canInteract(member)) return;
-        Role role = guild.getRoleById(roleId);
-        if (role == null) return;
-        if (!member.getRoles().contains(role)) return;
-        guild.removeRoleFromMember(member, role).queue();
+        if (role == null)
+            role = member.getGuild().getRoleById(roleId);
+        member.getGuild().removeRoleFromMember(member, role).queue();
     }
 
     public String getChannelId() {
