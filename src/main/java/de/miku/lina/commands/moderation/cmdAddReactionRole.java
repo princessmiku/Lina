@@ -7,7 +7,10 @@ import de.miku.lina.utils.DataShare;
 import de.miku.lina.utils.DiscordEmbeds;
 import de.miku.lina.utils.ReactionRole;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -16,6 +19,9 @@ import net.dv8tion.jda.api.exceptions.ContextException;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
+import java.awt.*;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -28,97 +34,81 @@ public class cmdAddReactionRole extends Command {
 
     @Override
     protected void generateCommandData() {
-        commandData = new CommandData(name, description).addOption(OptionType.ROLE, "role", "Add to a message the desired reaction, which should be the reaction message");
+        commandData = new CommandData(name, description).addOption(OptionType.ROLE, "role", "Add to a message the desired reaction, which should be the reaction message", true);
     }
 
     @Override
     public void onSlash(SlashCommandEvent event) {
         Role role = event.getOptions().get(0).getAsRole();
+        if (!event.getGuild().getSelfMember().canInteract(role)) {
+            event.replyEmbeds(DiscordEmbeds.error(event.getUser(), "I can't interact with this role")).queue();
+            return;
+        }
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("New reaction role");
         embed.setDescription("Add to a message the desired reaction, which should be the reaction message for the role `%s`".formatted(role.getName()));
         embed.setColor(ColorPlate.BLUE);
         event.replyEmbeds(embed.build()).queue(
-                message -> DataShare.eventWaiter.waitForEvent(
-                        MessageReactionAddEvent.class, e -> {
-                            if (e.getMember() != event.getMember())
-                                return false;
-                            return true;
-                        },
-                        evr -> {
-                            MessageReactionAddEvent e = (MessageReactionAddEvent) evr;
-                            String messageId = e.getMessageId();
-                            String channelId = e.getChannel().getId();
-                            String emoji = e.getReactionEmote().toString();
-                            e.getTextChannel().retrieveMessageById(messageId).queue( msg -> {
-                                if (msg == null) {
-                                    message.editOriginalEmbeds(DiscordEmbeds.error(event.getUser(), "message not found")).queue();
-                                    return;
-                                }
-                                try {
-                                    Objects.requireNonNull(msg).removeReaction(e.getReactionEmote().getEmote(), Objects.requireNonNull(e.getUser())).queue();
-                                } catch (IllegalStateException error) {
-                                    Objects.requireNonNull(msg).removeReaction(e.getReactionEmote().getEmoji(), Objects.requireNonNull(e.getUser())).queue();
-                                }
-                                try {
-                                    msg.addReaction(e.getReactionEmote().getEmote()).queue(msg1 -> {
-                                        EmbedBuilder embedBuilder = new EmbedBuilder();
-                                        try {
-                                            embedBuilder.setDescription(
-                                                    "Reaction successfully created!\n\nRole: %s\nChannel: %s\nMessage ID: `%s`\nEmoji: %s".formatted(
-                                                            role.getAsMention(), e.getTextChannel().getAsMention(), messageId, e.getReactionEmote().getEmote()));
-                                        } catch (IllegalStateException error1) {
-                                            embedBuilder.setDescription(
-                                                    "Reaction successfully created!\n\nRole: %s\nChannel: %s\nMessage ID: `%s`\nEmoji: %s".formatted(
-                                                            role.getAsMention(), e.getTextChannel().getAsMention(), messageId, e.getReactionEmote().getEmoji()));
-                                        }
-                                        embedBuilder.setColor(ColorPlate.GREEN);
-                                        embedBuilder.setTitle("Created!");
-                                        DataShare.guildHandler.getGuild(event.getGuild()).addReactionRole(new ReactionRole(channelId, messageId, role.getId(), emoji));
-                                        DataShare.guildHandler.save();
-                                        message.editOriginalEmbeds(embedBuilder.build()).queueAfter(5, TimeUnit.SECONDS, message1 -> {
-                                            message1.delete().queue();
-                                        });
-                                    });
-                                }  catch (IllegalStateException error) {
-                                    try {
-                                        msg.addReaction(e.getReactionEmote().getEmoji()).queue(msg1 -> {
-                                            EmbedBuilder embedBuilder = new EmbedBuilder();
-                                            try {
-                                                embedBuilder.setDescription(
-                                                        "Reaction successfully created!\n\nRole: %s\nChannel: %s\nMessage ID: `%s`\nEmoji: %s".formatted(
-                                                                role.getAsMention(), e.getTextChannel().getAsMention(), messageId, e.getReactionEmote().getEmote()));
-                                            } catch (IllegalStateException error1) {
-                                                embedBuilder.setDescription(
-                                                        "Reaction successfully created!\n\nRole: %s\nChannel: %s\nMessage ID: `%s`\nEmoji: %s".formatted(
-                                                                role.getAsMention(), e.getTextChannel().getAsMention(), messageId, e.getReactionEmote().getEmoji()));
-                                            }
-                                            embedBuilder.setColor(ColorPlate.GREEN);
-                                            embedBuilder.setTitle("Created!");
-                                            DataShare.guildHandler.getGuild(event.getGuild()).addReactionRole(new ReactionRole(channelId, messageId, role.getId(), emoji));
-                                            DataShare.guildHandler.save();
-                                            message.editOriginalEmbeds(embedBuilder.build()).queueAfter(5, TimeUnit.SECONDS, message1 -> {
-                                                message1.delete().queue();
-                                            });
-                                        });
-                                    } catch (IllegalAccessError error1) {
-                                        message.editOriginalEmbeds(DiscordEmbeds.error(event.getUser(), "I can't add this emoji")).queue();
+                msg -> {
+                        DataShare.eventWaiter.waitForEvent(MessageReactionAddEvent.class, e -> {
+                        if(e.getMember() != event.getMember() && e.getGuild() != event.getGuild()) return false;
+                        return true;
+                    }, e -> {
+                            Member self = event.getGuild().getSelfMember();
+                            if (!self.hasPermission(event.getTextChannel(),Permission.MESSAGE_MANAGE)) {
+                                msg.editOriginalEmbeds(DiscordEmbeds.invalidSelfPermission(Permission.MESSAGE_MANAGE)).queue(errorMSG -> errorMSG.delete().queueAfter(5, TimeUnit.SECONDS));
+                                return;
+                            }
+                            if (!self.hasPermission(event.getTextChannel(),Permission.MESSAGE_ADD_REACTION)) {
+                                msg.editOriginalEmbeds(DiscordEmbeds.invalidSelfPermission(Permission.MESSAGE_ADD_REACTION)).queue(errorMSG -> errorMSG.delete().queueAfter(5, TimeUnit.SECONDS));
+                                return;
+                            }
+                            String messageId = e.getMessageId(), channelId = e.getChannel().getId(), emote = e.getReactionEmote().toString();
+                            Message message = e.getChannel().retrieveMessageById(messageId).complete();
+                            MessageReaction.ReactionEmote reaction = e.getReaction().getReactionEmote();
+                            boolean isEmote = false;
+                            try {
+                                message.removeReaction(reaction.getEmoji(), event.getUser()).queue();
+                            } catch (IllegalStateException error) {
+                                message.removeReaction(reaction.getEmote(), event.getUser()).queue();
+                                isEmote = true;
+                            } catch (Exception error) {
+                                msg.editOriginalEmbeds(DiscordEmbeds.internalError()).queue(errorMSG -> errorMSG.delete().queueAfter(5, TimeUnit.SECONDS));
+                                return;
+                            }
+                            try {
+                                if (!isEmote) {
+                                    message.addReaction(reaction.getEmoji()).complete();
+                                } else {
+                                    if (!reaction.getEmote().isAvailable()) {
+                                        msg.editOriginalEmbeds(DiscordEmbeds.error(event.getUser(), "I can't use this emoji")).queue(errorMSG -> errorMSG.delete().queueAfter(5, TimeUnit.SECONDS));
                                         return;
                                     }
-                                } catch (Exception error) {
-                                    message.editOriginalEmbeds(DiscordEmbeds.error(event.getUser(), "I can't add this emoji")).queue();
-                                    return;
+                                    message.addReaction(reaction.getEmote()).complete();
                                 }
-
+                            } catch (Exception error) {
+                                msg.editOriginalEmbeds(DiscordEmbeds.internalError()).queue(errorMSG -> errorMSG.delete().queueAfter(5, TimeUnit.SECONDS));
+                                return;
                             }
-                            );
+                            String embedString = "Reaction successfully created! Role: %s\nChannel: %s\nMessage: %s\nEmoji: %s";
+                            if (isEmote)
+                                embedString = embedString.formatted(role.getAsMention(), e.getTextChannel().getAsMention(), message.getJumpUrl(), reaction.getEmote());
+                            else
+                                embedString = embedString.formatted(role.getAsMention(), e.getTextChannel().getAsMention(), message.getJumpUrl(), reaction.getEmoji());
+                            DataShare.guildHandler.getGuild(event.getGuild()).addReactionRole(new ReactionRole(channelId, messageId, role.getId(), emote));
+                            DataShare.guildHandler.save();
+                            EmbedBuilder builder = new EmbedBuilder();
+                            builder.setTitle("Creation Successful");
+                            builder.setDescription(embedString);
+                            builder.setColor(ColorPlate.BLUE);
+                            msg.editOriginalEmbeds(builder.build()).queue();
+                    }, 2, TimeUnit.MINUTES, () -> {
+                            msg.editOriginalEmbeds(DiscordEmbeds.error(event.getUser(), "Time out...")).queue(errorMSG -> errorMSG.delete().queueAfter(5, TimeUnit.SECONDS));
+                            return;
+                        });
 
-                        },
-                        1, TimeUnit.MINUTES,
-                        () -> {
-                            message.editOriginalEmbeds(DiscordEmbeds.error(event.getUser(), "You didn't respond in time!")).queue();
-                        }
-                        ));
+                }
+        );
     }
 
     @Override
