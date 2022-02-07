@@ -26,7 +26,7 @@ public class DataShare {
 
     public static List<String> ignoreReactions = new ArrayList<>();
     public static Map<String, Command> commands = new HashMap<>();
-    public final static EventWaiter eventWaiter = new EventWaiter();
+    public static EventWaiter eventWaiter = new EventWaiter();
 
 
 

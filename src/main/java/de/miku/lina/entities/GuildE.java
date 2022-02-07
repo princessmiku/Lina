@@ -4,6 +4,7 @@ import de.miku.lina.utils.ReactionRole;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -11,7 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GuildE {
+public class GuildE implements Serializable {
 
     private String _id, name, createdAt;
     private Map<String, Map<String, Map<String, ReactionRole>>> reactionRoles;

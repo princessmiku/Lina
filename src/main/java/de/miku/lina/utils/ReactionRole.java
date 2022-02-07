@@ -5,7 +5,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 
-public class ReactionRole {
+import java.io.Serializable;
+
+public class ReactionRole implements Serializable {
 
     private String channelId, messageId, roleId, emoji;
     private Role role;

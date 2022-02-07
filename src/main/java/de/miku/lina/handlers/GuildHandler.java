@@ -19,10 +19,10 @@ import java.util.Map;
 public class GuildHandler {
 
     private Map<String, GuildE> guilds;
-    Gson gsonSave = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting().create();
+    private static final Gson gson = new Gson();
+
     public GuildHandler() {
         guilds = new HashMap<>();
-        Gson gson = new Gson();
         JsonReader reader = null;
         try {
             reader = new JsonReader(new FileReader("./guilds.json"));
@@ -60,12 +60,12 @@ public class GuildHandler {
 
     public void save() {
         try {
-            Writer writer = new FileWriter("./guilds.json");
-            gsonSave.toJson(guilds, writer);
-            Logging.info("Successful save guilds");
+            BufferedWriter writer = new BufferedWriter(new FileWriter("./guilds.json"));
+            writer.write(gson.toJson(guilds));
             writer.close();
+            Logging.info("Successful save guilds");
         } catch (Exception e) {
-            String json = gsonSave.toJson(guilds);
+            String json = gson.toJson(guilds);
             Logging.warning("WARNING SAVING", "CAN'T SAVE GUILDS, try catch it in lastGuilds.txt");
             try {
                 FileWriter fileWriter = new FileWriter("./lastGuilds.txt");
