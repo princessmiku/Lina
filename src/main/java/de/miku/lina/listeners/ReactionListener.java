@@ -14,6 +14,11 @@ public class ReactionListener extends ListenerAdapter {
 
     @Override
     public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
+        if (event.getUserId().equals(DataShare.jda.getSelfUser().getId())) return;
+        if (DataShare.ignoreReactions.contains(event.getUserId())) {
+            DataShare.ignoreReactions.remove(event.getUserId());
+            return;
+        }
         GuildE guildE = DataShare.guildHandler.getGuild(event.getGuild());
         ReactionRole reactionRole = guildE.getReactionRole(event.getChannel().getId(), event.getMessageId(), event.getReactionEmote().toString());
         if (reactionRole != null) {

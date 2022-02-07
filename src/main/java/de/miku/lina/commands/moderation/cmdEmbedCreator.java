@@ -8,7 +8,10 @@ import de.miku.lina.utils.ColorPlate;
 import de.miku.lina.utils.DataShare;
 import de.miku.lina.utils.DiscordEmbeds;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -45,6 +48,10 @@ public class cmdEmbedCreator extends Command {
 
     @Override
     public void onMessage(MessageReceivedEvent event, String[] args) {
+        //if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+        //    event.getMessage().reply(DiscordEmbeds.invalidPermission(event.getAuthor(), Permission.ADMINISTRATOR)).queue();
+        //    return;
+        //}
         if (event.getMessage().getMentionedChannels().isEmpty()) {
             EmbedBuilder embedBuilder = new EmbedBuilder();
             embedBuilder.setTitle("Embed creator tutorial");
@@ -55,7 +62,7 @@ public class cmdEmbedCreator extends Command {
                     **1** Create your embed on the web page. *Tip: Use the broom to delete the content.*
                     **2** Change top left from `Gui` to `Json`.
                     **3.** Copy the content
-                    **4.** Execute this command again with channel specifying `embedcreator [channel]`, you can also edit one using `embedcreator edit [channel] [messageId]`. Or use the slash commands
+                    **4.** Execute this command again with channel specifying `embed [channel]`, you can also edit one using `embed edit [channel] [messageId]`. Or use the slash commands
                     **5.** Send the JSON to the chat, this can be done as a message or if the characters are not enough as a file. The file must be called `message.txt`, this will be created automatically by discord.
                     **6.** Done, the embed has now been sent to the specified channel.""");
             embedBuilder.setColor(ColorPlate.BLUE);
@@ -66,9 +73,26 @@ public class cmdEmbedCreator extends Command {
             event.getMessage().reply("*feature not included*").queue();
             return;
         }
+
+        TextChannel channel = event.getMessage().getMentionedChannels().get(0);
+        Member self = event.getGuild().getSelfMember();
+
+        if (!self.hasPermission(channel, Permission.MESSAGE_WRITE)) {
+            event.getMessage().reply(DiscordEmbeds.invalidSelfPermission(Permission.MESSAGE_WRITE)).queue();
+            return;
+        }
+        if (!self.hasPermission(channel, Permission.MESSAGE_EMBED_LINKS)) {
+            event.getMessage().reply(DiscordEmbeds.invalidSelfPermission(Permission.MESSAGE_EMBED_LINKS)).queue();
+            return;
+        }
+        if (!event.getMember().hasPermission(channel, Permission.MESSAGE_WRITE)) {
+            event.getMessage().reply(DiscordEmbeds.invalidPermission(event.getAuthor(), Permission.MESSAGE_WRITE)).queue();
+            return;
+        }
+
         event.getMessage().reply(new EmbedBuilder().setDescription("Send the json as text or as file, discord will create it").setColor(ColorPlate.BLUE).build()).queue();
         DataShare.eventWaiter.waitForEvent(MessageReceivedEvent.class, event1 -> {
-            if (event1.getMember() == event.getMember() && event.getChannel() == event1.getChannel() && event.getMessage() != event1.getMessage()) return true;
+            if (event.getMember().getId().equals(event1.getMember().getId()) && event.getChannel().getId().equals(event1.getChannel().getId()) && !event.getMessage().getId().equals(event1.getMessageId())) return true;
             return false;
         }, e -> {
             Message message = e.getMessage();

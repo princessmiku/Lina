@@ -67,6 +67,7 @@ public class cmdAddReactionRole extends Command {
                             Message message = e.getChannel().retrieveMessageById(messageId).complete();
                             MessageReaction.ReactionEmote reaction = e.getReaction().getReactionEmote();
                             boolean isEmote = false;
+                            DataShare.ignoreReactions.add(e.getUserId());
                             try {
                                 message.removeReaction(reaction.getEmoji(), event.getUser()).queue();
                             } catch (IllegalStateException error) {
@@ -74,6 +75,7 @@ public class cmdAddReactionRole extends Command {
                                 isEmote = true;
                             } catch (Exception error) {
                                 msg.editOriginalEmbeds(DiscordEmbeds.internalError()).queue(errorMSG -> errorMSG.delete().queueAfter(5, TimeUnit.SECONDS));
+                                DataShare.ignoreReactions.remove(e.getUserId());
                                 return;
                             }
                             try {
@@ -101,7 +103,7 @@ public class cmdAddReactionRole extends Command {
                             builder.setTitle("Creation Successful");
                             builder.setDescription(embedString);
                             builder.setColor(ColorPlate.BLUE);
-                            msg.editOriginalEmbeds(builder.build()).queue(errorMSG -> errorMSG.delete().queueAfter(5, TimeUnit.SECONDS));
+                            msg.editOriginalEmbeds(builder.build()).queue(errorMSG -> errorMSG.delete().queueAfter(8, TimeUnit.SECONDS));
                     }, 2, TimeUnit.MINUTES, () -> {
                             msg.editOriginalEmbeds(DiscordEmbeds.error(event.getUser(), "Time out...")).queue(errorMSG -> errorMSG.delete().queueAfter(5, TimeUnit.SECONDS));
                             return;

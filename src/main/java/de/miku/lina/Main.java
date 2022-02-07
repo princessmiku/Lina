@@ -25,9 +25,15 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws LoginException {
+        // "enable single core support for jda"
+        final int cores = Runtime.getRuntime().availableProcessors();
+        if (cores <= 1) {
+            System.out.println("Available Cores \"" + cores + "\", setting Parallelism Flag");
+            System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "1");
+        }
         // init config handler
         try {
-            DataShare.configHandler = new ConfigHandler("./src/main/resources/config.ini");
+            DataShare.configHandler = new ConfigHandler("./config.ini");
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(0);

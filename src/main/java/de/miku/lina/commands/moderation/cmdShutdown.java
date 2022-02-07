@@ -27,7 +27,8 @@ public class cmdShutdown extends Command {
             event.getMessage().reply("no").queue();
             return;
         }
-        event.getMessage().reply(":wave:").queue();
-        System.exit(0);
+        event.getMessage().reply(":wave:").queue(e -> {
+            System.exit(0);
+        });
     }
 }

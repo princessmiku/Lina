@@ -19,13 +19,13 @@ import java.util.Map;
 public class GuildHandler {
 
     private Map<String, GuildE> guilds;
-
+    Gson gsonSave = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting().create();
     public GuildHandler() {
         guilds = new HashMap<>();
         Gson gson = new Gson();
         JsonReader reader = null;
         try {
-            reader = new JsonReader(new FileReader("./src/main/resources/guilds.json"));
+            reader = new JsonReader(new FileReader("./guilds.json"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             System.exit(0);
@@ -59,14 +59,21 @@ public class GuildHandler {
     }
 
     public void save() {
-        Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting()
-                .create();
         try {
-            Writer writer = new FileWriter("./src/main/resources/guilds.json");
-            gson.toJson(guilds, writer);
+            Writer writer = new FileWriter("./guilds.json");
+            gsonSave.toJson(guilds, writer);
+            Logging.info("Successful save guilds");
             writer.close();
-        } catch (IOException e) {
-            Logging.warning("WARNING SAVING", gson.toJson(guilds));
+        } catch (Exception e) {
+            String json = gsonSave.toJson(guilds);
+            Logging.warning("WARNING SAVING", "CAN'T SAVE GUILDS, try catch it in lastGuilds.txt");
+            try {
+                FileWriter fileWriter = new FileWriter("./lastGuilds.txt");
+                fileWriter.write(json);
+                fileWriter.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
