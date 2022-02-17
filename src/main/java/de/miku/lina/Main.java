@@ -19,12 +19,34 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.internal.utils.AllowedMentionsImpl;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
 
-public class Main {
-    public static void main(String[] args) throws LoginException {
+@SpringBootApplication
+public class Main implements CommandLineRunner {
+
+
+    public static void main(String[] args) {
+        // Start spring
+        SpringApplication.run(Main.class, args);
+    }
+
+    @Override
+    public void run(String... args) {
+        // try to start the bot, else close
+        try {
+            startBot(args);
+        } catch (LoginException e) {
+            Logging.error("CAN'T START DISCORD BOT");
+            System.exit(0);
+        }
+    }
+
+    public static void startBot(String... args) throws LoginException {
         // "enable single core support for jda"
         final int cores = Runtime.getRuntime().availableProcessors();
         if (cores <= 1) {
