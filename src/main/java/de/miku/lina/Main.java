@@ -57,18 +57,19 @@ public class Main {
         );
         // register events
         registerEvent(builder);
-        registerCommands();
         // load the guilds
         DataShare.guildHandler = new GuildHandler();
 
         // build the bot
         DataShare.jda = builder.build();
         // init the command handler
-        DataShare.commandHandler = new CommandHandler();
+        DataShare.commandHandler = new CommandHandler(DataShare.configHandler.getString("DISCORD", "prefix"));
+        // register commands
+        registerCommands();
+        // "re"load command system
+        DataShare.commandHandler.loadCommands();
         // init the interaction handler after the command handler, for not floating the help list
         DataShare.interactionHandler = new InteractionHandler();
-        // init commands that should be hidden, hidden commands are not slash compatible
-        registerHiddenCommands();
 
         // init handlers after build the jda
         Logging.info(Main.class, "Bot is online...");
@@ -93,10 +94,9 @@ public class Main {
         new cmdAddReactionRole();
         new cmdHelpFull();
         new cmdEmbedCreator();
+        // init commands that should be hidden in the help list
+        DataShare.commandHandler.setHiddenCommand(new cmdShutdown());
     }
 
-    public static void registerHiddenCommands() {
-        new cmdShutdown();
-    }
 
 }
