@@ -2,10 +2,7 @@ package de.miku.lina.utils;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import de.miku.lina.commands.Command;
-import de.miku.lina.handlers.CommandHandler;
-import de.miku.lina.handlers.ConfigHandler;
-import de.miku.lina.handlers.GuildHandler;
-import de.miku.lina.handlers.InteractionHandler;
+import de.miku.lina.handlers.*;
 import net.dv8tion.jda.api.JDA;
 
 import java.util.ArrayList;
@@ -21,6 +18,7 @@ public class DataShare {
     public static CommandHandler commandHandler;
     public static InteractionHandler interactionHandler;
     public static GuildHandler guildHandler;
+    public static UserHandler userHandler;
 
     public static JDA jda;
 

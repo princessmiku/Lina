@@ -1,22 +1,24 @@
 package de.miku.lina;
 
 import de.miku.lina.commands.fun.cmdHey;
+import de.miku.lina.commands.information.cmdDescription;
 import de.miku.lina.commands.information.cmdHelp;
 import de.miku.lina.commands.information.cmdHelpFull;
 import de.miku.lina.commands.interactions.cmdInteracts;
 import de.miku.lina.commands.moderation.*;
-import de.miku.lina.handlers.CommandHandler;
-import de.miku.lina.handlers.ConfigHandler;
-import de.miku.lina.handlers.GuildHandler;
-import de.miku.lina.handlers.InteractionHandler;
+import de.miku.lina.handlers.*;
 import de.miku.lina.listeners.MessageListener;
 import de.miku.lina.listeners.ReactionListener;
 import de.miku.lina.listeners.SlashListener;
+import de.miku.lina.spring.SpringRepos;
+import de.miku.lina.spring.entity.DBUser;
+import de.miku.lina.spring.repo.DBUserRepository;
 import de.miku.lina.utils.DataShare;
 import de.miku.lina.utils.Logging;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.internal.utils.AllowedMentionsImpl;
 import org.springframework.boot.CommandLineRunner;
@@ -24,9 +26,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.security.auth.login.LoginException;
+import javax.transaction.Transactional;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @SpringBootApplication
+@Transactional
 public class Main implements CommandLineRunner {
 
 
@@ -35,18 +40,18 @@ public class Main implements CommandLineRunner {
         SpringApplication.run(Main.class, args);
     }
 
-    @Override
-    public void run(String... args) {
-        // try to start the bot, else close
+
+    public Main(DBUserRepository dbUserRepository) {
+        SpringRepos.dbUserRepository = dbUserRepository;
         try {
-            startBot(args);
+            startBot();
         } catch (LoginException e) {
             Logging.error("CAN'T START DISCORD BOT");
             System.exit(0);
         }
     }
 
-    public static void startBot(String... args) throws LoginException {
+    public static void startBot() throws LoginException {
         // "enable single core support for jda"
         final int cores = Runtime.getRuntime().availableProcessors();
         if (cores <= 1) {
@@ -81,6 +86,8 @@ public class Main implements CommandLineRunner {
         registerEvent(builder);
         // load the guilds
         DataShare.guildHandler = new GuildHandler();
+        // register user handler
+        DataShare.userHandler = new UserHandler(SpringRepos.dbUserRepository);
 
         // build the bot
         DataShare.jda = builder.build();
@@ -116,9 +123,14 @@ public class Main implements CommandLineRunner {
         new cmdAddReactionRole();
         new cmdHelpFull();
         new cmdEmbedCreator();
+        new cmdDescription();
         // init commands that should be hidden in the help list
         DataShare.commandHandler.setHiddenCommand(new cmdShutdown());
     }
 
 
+    @Override
+    public void run(String... args) throws Exception {
+
+    }
 }
