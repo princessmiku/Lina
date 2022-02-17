@@ -6,7 +6,7 @@ import de.miku.lina.utils.DataShare;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +92,7 @@ public class CommandHandler {
         helpEmbed = embedBuilder.build();
     }
 
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandInteractionEvent event) {
         // get name of the event
         String name = event.getName();
         // get command
@@ -107,7 +107,7 @@ public class CommandHandler {
 
         // check if message starts with prefix and the author is not a bot
         if (!event.getMessage().getContentDisplay().startsWith(prefix) || event.getAuthor().isBot()) return;
-        if (!event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_WRITE) || !event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS))
+        if (!event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_SEND) || !event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_EMBED_LINKS))
             return;
         // split the message in args
         String[] args = event.getMessage().getContentRaw().split(" ");

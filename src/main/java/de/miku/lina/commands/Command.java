@@ -1,7 +1,7 @@
 package de.miku.lina.commands;
 
 import de.miku.lina.utils.DataShare;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
@@ -26,7 +26,7 @@ public abstract class Command {
 
     protected abstract void generateCommandData();
 
-    public abstract void onSlash(SlashCommandEvent event);
+    public abstract void onSlash(SlashCommandInteractionEvent event);
 
     public abstract void onMessage(MessageReceivedEvent event, String[] args);
 

@@ -1,7 +1,7 @@
 package de.miku.lina.commands.moderation;
 
 import de.miku.lina.commands.Command;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class cmdShutdown extends Command {
@@ -17,7 +17,7 @@ public class cmdShutdown extends Command {
     }
 
     @Override
-    public void onSlash(SlashCommandEvent event) {
+    public void onSlash(SlashCommandInteractionEvent event) {
 
     }
 

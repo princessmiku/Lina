@@ -2,7 +2,6 @@ package de.miku.lina.utils;
 
 import de.miku.lina.commands.Command;
 import de.miku.lina.commands.interactions.InteractionCommand;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.io.File;

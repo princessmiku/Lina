@@ -8,10 +8,11 @@ import de.miku.lina.utils.PermChecker;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.internal.interactions.CommandDataImpl;
 
 import java.util.ArrayList;
 
@@ -27,14 +28,14 @@ public class cmdBan extends Command {
 
     @Override
     protected void generateCommandData() {
-        commandData = new CommandData(name, "Ban a member from your guild.").addOption(
+        commandData = new CommandDataImpl(name, "Ban a member from your guild.").addOption(
                 OptionType.USER, "member", "select user to ban", true
         );
 
     }
 
     @Override
-    public void onSlash(SlashCommandEvent event) {
+    public void onSlash(SlashCommandInteractionEvent event) {
         Member selfMember = event.getGuild().getSelfMember();
         if (!PermChecker.canBan(selfMember)) {
             event.replyEmbeds(DiscordEmbeds.invalidSelfPermission(Permission.BAN_MEMBERS)).queue();
@@ -73,15 +74,15 @@ public class cmdBan extends Command {
     public void onMessage(MessageReceivedEvent event, String[] args) {
         Member selfMember = event.getGuild().getSelfMember();
         if (!PermChecker.canBan(selfMember)) {
-            event.getMessage().reply(DiscordEmbeds.invalidSelfPermission(Permission.BAN_MEMBERS)).queue();
+            event.getMessage().replyEmbeds(DiscordEmbeds.invalidSelfPermission(Permission.BAN_MEMBERS)).queue();
             return;
         }
         if (!PermChecker.canBan(event.getMember())) {
-            event.getMessage().reply(DiscordEmbeds.invalidPermission(event.getAuthor(), Permission.BAN_MEMBERS)).queue();
+            event.getMessage().replyEmbeds(DiscordEmbeds.invalidPermission(event.getAuthor(), Permission.BAN_MEMBERS)).queue();
             return;
         }
         if (event.getMessage().getMentionedMembers().isEmpty()) {
-            event.getMessage().reply(DiscordEmbeds.noMention(event.getAuthor())).queue();
+            event.getMessage().replyEmbeds(DiscordEmbeds.noMention(event.getAuthor())).queue();
             return;
         }
         ArrayList<Member> cantBanMembers = new ArrayList<>();
@@ -109,7 +110,7 @@ public class cmdBan extends Command {
         embed.setColor(ColorPlate.GREEN);
         embed.setDescription("I banned the mentioned members" + cantBanStr);
         embed.setFooter("Banned %s/%s".formatted(String.valueOf(event.getMessage().getMentionedMembers().size() - cantBanMembers.size()), String.valueOf(event.getMessage().getMentionedMembers().size())));
-        event.getMessage().reply(embed.build()).queue();
+        event.getMessage().replyEmbeds(embed.build()).queue();
 
     }
 

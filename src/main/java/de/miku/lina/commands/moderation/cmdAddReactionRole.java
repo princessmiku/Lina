@@ -12,12 +12,13 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.ContextException;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.internal.interactions.CommandDataImpl;
 
 import java.awt.*;
 import java.util.Collection;
@@ -34,11 +35,11 @@ public class cmdAddReactionRole extends Command {
 
     @Override
     protected void generateCommandData() {
-        commandData = new CommandData(name, description).addOption(OptionType.ROLE, "role", "Add to a message the desired reaction, which should be the reaction message", true);
+        commandData = new CommandDataImpl(name, description).addOption(OptionType.ROLE, "role", "Add to a message the desired reaction, which should be the reaction message", true);
     }
 
     @Override
-    public void onSlash(SlashCommandEvent event) {
+    public void onSlash(SlashCommandInteractionEvent event) {
         Role role = event.getOptions().get(0).getAsRole();
         if (!event.getGuild().getSelfMember().canInteract(role)) {
             event.replyEmbeds(DiscordEmbeds.error(event.getUser(), "I can't interact with this role")).queue();

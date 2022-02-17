@@ -1,12 +1,9 @@
 package de.miku.lina.handlers;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import de.miku.lina.entities.GuildE;
-import de.miku.lina.utils.Interaction;
 import de.miku.lina.utils.Logging;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;

@@ -6,7 +6,6 @@ import de.miku.lina.utils.DataShare;
 import de.miku.lina.utils.Interaction;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
@@ -48,7 +47,7 @@ public class InteractionCommand{
             }
             toFill = interaction.getMention().replaceAll("\\{author\\}", "**" + event.getAuthor().getName() + "**").replaceAll("\\{mention\\}", "**" + names.substring(0, names.length() - 2) + "**");
         }
-        event.getMessage().reply(new EmbedBuilder().setDescription(toFill).setImage(interaction.getRandomGif()).setColor(ColorPlate.PINK).build()).queue();
+        event.getMessage().replyEmbeds(new EmbedBuilder().setDescription(toFill).setImage(interaction.getRandomGif()).setColor(ColorPlate.PINK).build()).queue();
     }
 
 }
